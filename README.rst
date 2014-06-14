@@ -82,13 +82,21 @@ higher-order programming.
 - ``func.foreach(func, table)`` runs a function of the form 
   ``function(key, value)`` over each key of the table. This function always
   returns ``nil``.
+- ``func.foreachl(func, list)`` works like ``func.foreach``, but the callback
+  takes only one argument (the value - the key is omitted).
 - ``func.map(func, table)`` runs a function of the form 
   ``function(key, value)`` over each key of the table, putting the return
   value back into the return table under the same key.
+- ``func.mapl(func, list)`` works like ``func.map``, but the callback
+  takes only the key, and anything returned from the callback is implicitly
+  indexed.
 - ``func.filter(func, table)`` runs the function over each key of the table
   (of the same form accepted by ``func.foreach`` and ``func.map``), and
   adds the value to the return table under the same key if the callback
   returns ``true``.
+- ``func.filterl(func, list)`` works like ``func.filter``, but the callback
+  takes only the key, and anything added to the return list is implicitly
+  indexed.
 - ``func.chain(argl, ...)`` calls all the functions in ``...`` with the
   argument list given by ``argl``.
 
