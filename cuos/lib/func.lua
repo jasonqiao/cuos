@@ -21,7 +21,15 @@ function filter(func, tbl)
     for k, v in pairs(tbl) do
         if func(k, v) then
             new_tbl[k] = v
+        else
+            new_tbl[k] = nil
         end
     end
     return new_tbl
+end
+
+function chain(argl, ...)
+    for _, func in pairs({...}) do
+        func(unpack(argl))
+    end
 end

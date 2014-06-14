@@ -89,3 +89,22 @@ higher-order programming.
   (of the same form accepted by ``func.foreach`` and ``func.map``), and
   adds the value to the return table under the same key if the callback
   returns ``true``.
+- ``func.chain(argl, ...)`` calls all the functions in ``...`` with the
+  argument list given by ``argl``.
+
+The events Module
+~~~~~~~~~~~~~~~~~
+
+The ``events`` module is designed to abstract away the issues with the 
+``os.pullEvent`` API, and instead provide a simpler callback API.
+
+- ``events.EventLoop()`` returns an ``EventLoop`` object.
+
+The ``EventLoop`` object has the following API:
+
+- ``EventLoop.register(event_type, function)`` registers the given event with
+the given callback. Only one function may be registered to each callback in
+a given event loop.
+- ``EventLoop.next()`` waits for the next event.
+- ``EventLoop.run()`` runs the event loop until terminated.
+- ``EventLoop.terminate()`` terminates the event loop.
