@@ -102,9 +102,9 @@ The ``events`` module is designed to abstract away the issues with the
 
 The ``EventLoop`` object has the following API:
 
-- ``EventLoop.register(event_type, function)`` registers the given event with
+- ``EventLoop:register(event_type, function)`` registers the given event with
 the given callback. Only one function may be registered to each callback in
 a given event loop.
-- ``EventLoop.next()`` waits for the next event.
-- ``EventLoop.run()`` runs the event loop until terminated.
-- ``EventLoop.terminate()`` terminates the event loop.
+- ``EventLoop:next()`` waits for the next event.
+- ``EventLoop:run()`` runs the event loop until terminated.
+- ``EventLoop:terminate()`` terminates the event loop.
