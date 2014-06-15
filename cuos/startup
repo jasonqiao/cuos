@@ -19,6 +19,10 @@ return {
     methods = peripheral.wrap("%s")
 }
 ]==], side, peripheral.getType(side), side))
-        handle:close()
+    else
+        handle:write([==[
+return nil
+]==])
     end
+    handle:close()
 end
