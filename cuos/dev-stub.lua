@@ -25,7 +25,6 @@ return {
 ]==], side, peripheral.getType(side), side)
     end
 
-    print(content)
     handle.write(content)
     handle.close()
 end
