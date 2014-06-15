@@ -6,9 +6,9 @@ function Queue()
     return {
         items = {},
         left = 0,
-        right = 1,
+        right = -1,
         is_empty = function(this)
-            return math.abs(this.left - this.right) == 1
+            return this.right < this.left
         end,
         push_left = function(this, value)
             this.left = this.left - 1
