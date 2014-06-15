@@ -2,47 +2,93 @@
 A stub which provides the outline of a round-robin scheduler.
 --]]
 
-load('/lib/queue.lua')
+dofile('/lib/func.lua')
 
-processes = Queue()
-is_terminated = false
+processes = {}
 function scheduler()
+    local event_data = nil
+    local event_filters = {}
+    local invoked_processes = {}
+    local is_terminated = false
+
     while not is_terminated do
-        local current = current:pop_left()
-        if current ~= nil then
-            sleep(1)
+        -- Filter out any processes that don't need to be invoked, depending
+        -- upon the event that was caught
+        if event_data ~= nil and event_data[1] == "terminate" then
+            is_terminated = true
         else
-            coroutine.resume(current)
-            if coroutine.status() ~= "dead" then
-                current:push_right(current)
-            end
+            invoked_processes = filter(
+                function(_, routine)
+                    return (
+                        event_data == nil or
+                        event_filters[routine] == event_data[1] or
+                        event_filters[routine] == "")
+                end,
+                processes)
+
+            -- Invoke all the routines that match
+            foreach(
+                function(index, routine)
+                    local is_okay, param
+                    if event_data ~= nil then
+                        is_okay, param = coroutine.resume(routine,
+                            unpack(event_data))
+                    else
+                        is_okay, param = coroutine.resume(routine)
+                    end
+
+                    if not is_okay then
+                        error(param)
+                    else
+                        event_filters[routine] = param
+                    end
+                end,
+                invoked_processes)
+
+            -- Prune out all dead routines
+            processes = filter(
+                function(_, coro)
+                    return coroutine.status(coro) ~= "dead"
+                end,
+                processes)
+
+            event_filters = filter(
+                function(coro, _)
+                    return coroutine.status(coro) ~= "dead"
+                end,
+                event_filters)
+
+            event_data = {os.pullEventRaw()}
         end
     end
 end
 
 function schedule(func)
-    processes.push_right(coroutine.create(func))
+    processes[#processes + 1] = coroutine.create(func)
 end
 
 function a()
     for i = 0,5,1 do
         print("A")
-        coroutine.yield()
+        sleep(1)
     end
 end
 
 function b()
     for i = 0,5,1 do
         print("B")
-        coroutine.yield()
+        sleep(1)
     end
 end
 
 function c()
+    print("Waiting on C")
     sleep(10)
-    is_terminated = true
+    print("Terminating")
+    os.queueEvent('terminate')
 end
 
 schedule(a)
 schedule(b)
+schedule(c)
 scheduler()
