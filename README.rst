@@ -36,19 +36,41 @@ A Typical Execfile
 A typical execfile detailing a peripheral contains the following body:::
 
     return {
+        side = "left",
         type = "modem",
         methods = ...
     }
 
+The value for *side* can be:
+
+- "left", "right", "top", "bottom", "front", "back" to indicate a real
+  peripheral attached to the computer.
+- ``nil`` indicates an API which is provided by CUOS, and not any real
+  device.
+
+The value for *type* can be:
+
+- "modem", "printer", etc. to indicate a hardware device
+- "virtual" to indicate an API provided by CUOS
+
+The value for *methods* is a table of functions which indicate the
+functionality available for that peripheral.
+
 /dev
 ~~~~
 
-``/dev`` contains a list of execfiles:
+``/dev`` contains a list of execfiles. Note that the *S* in the device name
+is a side: L (left), R (right), T (top), U (under, or *bottom*), F (front), B (back).
 
-- ``/dev/net`` can be used to do socket-based networking.
+- ``/dev/modemS`` indicates a modem device.
+- ``/dev/printerS`` indicates a printer device.
+- ``/dev/computerS`` indicates a computer device.
+- ``/dev/commandS`` indicates a command block.
 - ``/dev/peripherals`` can contain the files *left*, *right*, 
     *front*, *back*, *top* and *bottom* describing the hardware devices
-    connected to the machine.
+    connected to the machine. These are equivalent to the devices under 
+    ``/dev`` - for example, if a modem is on the left, then 
+    ``/dev/peripherals/left`` is equivalent to ``/dev/modemL``.
 
 The cuos Module
 ~~~~~~~~~~~~~~~
