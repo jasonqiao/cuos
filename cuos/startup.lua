@@ -1,0 +1,22 @@
+--[[
+A stub which loads all the entries in the /dev filesystem.
+--]]
+
+SIDES = {'left', 'right', 'top', 'bottom', 'front', 'back'}
+
+-- Clean out the directory structure of /dev
+fs.delete('/dev')
+
+fs.makeDir('/dev')
+fs.makeDir('/dev/peripherals')
+for _, side in pairs(SIDES) do
+    local handle = fs.open('/dev/peripherals/' .. side, 'w')
+    handle.write(string.format([==[
+return {
+    side = "%s",
+    type = "%s",
+    methods = peripheral.wrap("%s")
+}
+]==], side, peripheral.getType(side), side))
+    handle.close()
+end
