@@ -26,6 +26,6 @@ return {
     end
 
     print(content)
-    handle:write(content)
-    handle:close()
+    handle.write(content)
+    handle.close()
 end
