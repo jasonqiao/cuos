@@ -22,7 +22,8 @@ function scheduler()
                     return (
                         event_data == nil or
                         event_filters[routine] == event_data[1] or
-                        event_filters[routine] == "")
+                        event_filters[routine] == "" or
+                        event_filters[routine] == nil)
                 end,
                 processes)
 
