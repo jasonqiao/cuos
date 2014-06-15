@@ -131,3 +131,19 @@ a given event loop.
 - ``EventLoop:next()`` waits for the next event.
 - ``EventLoop:run()`` runs the event loop until terminated.
 - ``EventLoop:terminate()`` terminates the event loop.
+
+The queue Module
+~~~~~~~~~~~~~~~~
+
+The ``queue`` module is an implementation of a Lua queue, using the
+two-indicies method.
+
+- ``queue.Queue()`` returns a ``Queue`` object.
+
+The ``Queue`` object has the following API:
+
+- ``Queue:is_empty()``
+- ``Queue:push_left(value)``
+- ``Queue:push_right(value)``
+- ``Queue:pop_left()``
+- ``Queue:pop_right()``
