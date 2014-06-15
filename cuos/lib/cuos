@@ -1,0 +1,92 @@
+--[[
+Core operating system utilities.
+--]]
+function import(lib)
+    local filename = "/lib/" .. lib .. ".lua"
+    local _loader = loadfile(filename)
+    if _loader == nil then
+        return nil
+    else
+        -- A safe way to recreate setfenv by loading the function bytecode
+        -- inside a new environment. This is necessary in case Computercraft
+        -- decides to switch to Lua 2.5, which lacks setfenv
+        local bytecode = string.dump(_loader)
+        local module = {}
+        local loader = load(bytecode, nil, nil, module)
+        loader()
+        return module
+    end
+end
+
+processes = {}
+function execute(func, ...)
+    local wrapper_args = {...}
+    function wrapper()
+        return func(unpack(wrapper_args))
+    end
+
+    local coro = coroutine.create(wrapper)
+    processes[coro] = true
+
+    -- Since the scheduler only reschedules a process when an event fires, we
+    -- need to signal that it needs to run this new process for the first
+    -- time. This notifies the scheduler without really doing anything.
+    time.sleep(0)
+
+    while coro.status() ~= "dead" do
+        -- This is a synthetic event, which is produced by the scheduler to
+        -- notify the death of a process. Although it returns the process,
+        -- the loop already tests to see if our process is dead, so
+        -- don't bother testing it twice
+        os.pullEvent('process_died')
+    end
+end
+
+function daemon(func, ...)
+    local wrapper_args = {...}
+    function wrapper()
+        return func(unpack(wrapper_args))
+    end
+
+    process[coroutine.create(wrapper)] = true
+
+    -- Since the scheduler only reschedules a process when an event fires, we
+    -- need to signal that it needs to run this new process for the first
+    -- time. This notifies the scheduler without really doing anything.
+    time.sleep(0)
+end
+
+function run_script(filename)
+    local handle = fs.open(filename, 'r')
+    if handle == nil then
+        error('Cannot run the script ' .. filename)
+    else
+        local line = handle.readLine()
+        shell.run(line)
+    end
+end
+
+function dev(filename)
+    local handle = loadfile(filename)
+    if handle == nil then
+        return nil
+    else
+        return handle()
+    end
+end
+
+function shell()
+    local command = ""
+    local done = false
+    while not done do
+        print(string.format("%s @ %d", shell.dir(), os.getComputerID()))
+        command = read()
+
+        first_word = string.gsub(command, "%s*(%S+)%s?.*", "%1")
+        if first_word == "exit" then
+            done = true
+        else
+            shell.run(command)
+        end
+    end
+end
