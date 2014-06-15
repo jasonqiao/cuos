@@ -11,12 +11,14 @@ fs.makeDir('/dev')
 fs.makeDir('/dev/peripherals')
 for _, side in pairs(SIDES) do
     local handle = fs.open('/dev/peripherals/' .. side, 'w')
-    handle:write(string.format([==[
+    if peripheral.getType(side) ~= nil then
+        handle:write(string.format([==[
 return {
     side = "%s",
     type = "%s",
     methods = peripheral.wrap("%s")
 }
 ]==], side, peripheral.getType(side), side))
-    handle:close()
+        handle:close()
+    end
 end
