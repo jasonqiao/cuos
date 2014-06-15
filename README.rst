@@ -88,9 +88,8 @@ The ``cuos`` module has the following API:
 - ``cuos.run_script(filename)`` runs a shell script, a sequence of commands
   which would otherwise be entered into the shell interactively.
 - ``cuos.import(library)`` loads a module from the directory `/lib`.
-  Users may put their libraries here, as CUOS tries to use the importing
-  mechanism as little as possible (preferring execfiles instead).
-- ``cuos.deport(library)`` does the opposite of ``cuos.import(library)``.
+  Note that, unlike os.loadAPI, this imports the library and returns it as a
+  value, so it isn't available everywhere.
 - ``cuos.dev(filename)`` opens up the given execfile, and returns its
   contents (or ``nil`` if the file doesn't exist).
 - ``cuos.shell()`` executes a shell which is similar to the CraftOS shell.
@@ -147,3 +146,23 @@ The ``Queue`` object has the following API:
 - ``Queue:push_right(value)``
 - ``Queue:pop_left()``
 - ``Queue:pop_right()``
+
+The socket Module
+~~~~~~~~~~~~~~~~~
+
+The ``socket`` module is an abstraction on top of the networking system, which
+is intended to be similar to Berkeley sockets. Currently, it does only 
+connectionless datagram sockets.
+
+- ``socket.Datagram(dev)`` returns a ``Datagram`` object, given the path to a modem
+  device.
+
+The ``Datagram`` object has the following API:
+
+- ``Datagram:bind(port)`` binds the socket to the given port, and becomes ready
+  to receive messages on that port.
+- ``Datagram:sendto(host, port, message)`` sends the given datagram to the
+  given host and port.
+- ``Datagram:recvfrom()`` waits for a message, returning ``host, port, message``.
+- ``Datagram:close()`` causes the socket to stop receiving messages, if was
+  already bound.
