@@ -77,11 +77,25 @@ function dev(filename)
     end
 end
 
-function shell()
+-- The OS initialization routine gets this for us
+shell = {}
+
+function run_shell()
     local command = ""
     local done = false
+
+    --shell.run('clear')
+    print("CUOS Shell")
+
     while not done do
-        print(string.format("%s @ %d", shell.dir(), os.getComputerID()))
+        local prompt = string.format("<</%s @ %d>>",
+                shell.dir(), 
+                os.getComputerID())
+
+        term.setTextColor(colors.orange)
+        print(prompt)
+        term.write("> ")
+        term.setTextColor(colors.white)
         command = read()
 
         first_word = string.gsub(command, "%s*(%S+)%s?.*", "%1")
