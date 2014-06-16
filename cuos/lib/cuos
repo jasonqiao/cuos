@@ -1,7 +1,17 @@
 --[[
 Core operating system utilities.
 --]]
-function import(lib)
+
+-- Cache imported modules, since os.loadAPI is to dumb to do this onits
+-- own. Since it doesn't cache, it makes it a pain in the ass to get to
+-- module state.
+local import_cache = {}
+
+function import(lib, force)
+    if import_cache[lib] and not force then
+        return import_cache[lib]
+    end
+
     local filename = lib .. ".lua"
     os.loadAPI("/lib/" .. filename)
 
@@ -9,10 +19,13 @@ function import(lib)
     local module = _G[filename]
     _G[filename] = nil
     _G[lib] = module
+
+    import_cache[lib] = module
 end
 
 function deport(lib)
     os.unloadAPI(lib)
+    import_cache[lib] = nil
 end
 
 -- Used by the scheduler, and the execution functions defined below
