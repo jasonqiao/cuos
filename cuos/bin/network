@@ -1,0 +1,9 @@
+cuos.import('naming')
+
+function main()
+    for host, id in naming.get_bindings() do
+        print("Host ", host, " --> ", tostring(id))
+    end
+end
+
+cuos.execute(main)

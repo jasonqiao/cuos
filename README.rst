@@ -208,3 +208,5 @@ up whenever a modem is connected.
   if none is registered, then ``nil`` is returned.
 - ``naming.get_hostname()`` returns the current hostname, or ``nil`` if none
   is set.
+- ``naming.get_bindings()`` returns an ``host, id`` iterator for all registered
+  hosts.

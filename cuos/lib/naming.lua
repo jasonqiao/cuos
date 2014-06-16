@@ -164,3 +164,7 @@ end
 function get_hostname()
     return hostname
 end
+
+function get_bindings()
+    return pairs(bindings)
+end
