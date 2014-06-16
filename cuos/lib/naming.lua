@@ -158,3 +158,7 @@ function resolve(name)
         return bindings[name]
     end
 end
+
+function get_hostname()
+    return hostname
+end
