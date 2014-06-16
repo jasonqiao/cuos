@@ -121,6 +121,8 @@ function service()
 
     reload_socket()
     while not handler.is_terminated do
+        binding_age[hostname] = os.clock()
+
         if datagram ~= nil then
             datagram:hook_recvfrom(handler, nil, naming_port)
             handler:next()
