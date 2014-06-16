@@ -14,6 +14,23 @@ function datagram_packet(host, port, data)
     }
 end
 
+-- Dammit. Thisis a really crappy kludge around the fact that
+-- we can't send more than one argument via os.queueEvent, so we
+-- have to save the most recent message here so that way an
+-- event handler can phone home and get it.
+local min_datagram_token = -100000
+local max_datagram_token = 100000
+function generate_id()
+    return math.random(min_datagram_token, max_datagram_token)
+end
+
+local saved_messages = {}
+function get_last_message(token)
+    local data = saved_messages[token]
+    saved_messages[token] = nil
+    return data.socket, data.host, data.port, data.data
+end
+
 function Datagram(device)
     local modem = cuos.dev(device)
     if modem == nil then
@@ -35,6 +52,44 @@ function Datagram(device)
             sendto = function(this, host, port, message)
                 this.modem.methods.transmit(port, port,
                     datagram_packet(host, port, message))
+            end,
+            hook_recvfrom = function(this, handler, host, port)
+                handler:register('modem_message',
+                    function(event, side, send_chan, reply_chan, packet, dist)
+                        local is_our_modem = (
+                            side == modem.side
+                        )
+
+                        -- Since we receive all packets with wireless modems,
+                        -- we have to drop some that aren't ours
+                        local is_packet_to_us = (
+                            packet.dest == os.getComputerID() or
+                            packet.dest == nil -- A broadcast packet
+                            )
+
+                        local host_matches = (
+                            host == nil or
+                            packet.source == host)
+
+                        local port_matches = (
+                            port == nil or
+                            packet.port == port)
+
+                        if (packet.type == "datagram" and
+                                is_packet_to_us and
+                                host_matches and 
+                                port_matches) then
+
+                            local message_token = generate_id()
+                            saved_messages[message_token] = {
+                                socket = this,
+                                host = packet.source, 
+                                port = packet.port,
+                                data = packet.data
+                            }
+                            os.queueEvent('datagram_recv', message_token)
+                        end
+                    end)
             end,
             recvfrom = function(this, host, port)
                 local event_handler = events.EventLoop()

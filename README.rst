@@ -161,8 +161,14 @@ The ``socket`` module is an abstraction on top of the networking system, which
 is intended to be similar to Berkeley sockets. Currently, it does only 
 connectionless datagram sockets.
 
-- ``socket.Datagram(dev)`` returns a ``Datagram`` object, given the path to a modem
-  device.
+- ``socket.Datagram(dev)`` returns a ``Datagram`` object, given the path to a 
+  modem device.
+- ``socket.generate_id()`` is not intended for public use. It generates a
+  "unique" (meaning, most likely unique) token for saving a message.
+- ``socket.get_last_message(token)`` takes a token given to a callback invoked
+  by ``Datagram:hook_recvfrom``, and returns the ``host, port, data`` of the
+  datagram's previous message (i.e. the one that caused the event to be
+  invoked).
 
 The ``Datagram`` object has the following API:
 
@@ -177,4 +183,11 @@ The ``Datagram`` object has the following API:
   message``. ``Datagram:recvfrom(host)`` waits for a message from a given host
   (but on any port) and ``Datagram:recvfrom(host, port)`` waits for a message
   from the given host on the given port.
+- ``Datagram:hook_recvfrom(handler, host, port)`` works like 
+  ``Datagram:recvfrom``, but instead of returning when the socket gets a
+  message, this invokes an OS event (which can be listened to using an
+  ``events.EventLoop``) called *datagram_recv* with a single parameter,
+  which is a token. To access the most recently received message, access
+  ``socket.get_last_message(token)`` which will return ``host, port, data`` of 
+  the most recent message.
 - ``Datagram:close()`` unbinds *all* ports bound by this socket.
