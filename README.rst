@@ -67,10 +67,10 @@ is a side: L (left), R (right), T (top), U (under, or *bottom*), F (front), B (b
 - ``/dev/computerS`` indicates a computer device.
 - ``/dev/commandS`` indicates a command block.
 - ``/dev/peripherals`` can contain the files *left*, *right*, 
-    *front*, *back*, *top* and *bottom* describing the hardware devices
-    connected to the machine. These are equivalent to the devices under 
-   ``/dev`` - for example, if a modem is on the left, then 
-    ``/dev/peripherals/left`` is equivalent to ``/dev/modemL``.
+  *front*, *back*, *top* and *bottom* describing the hardware devices
+  connected to the machine. These are equivalent to the devices under 
+  ``/dev`` - for example, if a modem is on the left, then 
+  ``/dev/peripherals/left`` is equivalent to ``/dev/modemL``.
 
 The cuos Module
 ~~~~~~~~~~~~~~~
@@ -145,8 +145,8 @@ The ``events`` module is designed to abstract away the issues with the
 The ``EventLoop`` object has the following API:
 
 - ``EventLoop:register(event_type, function)`` registers the given event with
-the given callback. Only one function may be registered to each callback in
-a given event loop.
+  the given callback. Only one function may be registered to each callback in
+  a given event loop.
 - ``EventLoop:next()`` waits for the next event.
 - ``EventLoop:run()`` runs the event loop until terminated.
 - ``EventLoop:terminate()`` terminates the event loop.
