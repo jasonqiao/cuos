@@ -88,9 +88,10 @@ The ``cuos`` module has the following API:
   be used for background services.
 - ``cuos.run_script(filename)`` runs a shell script, a sequence of commands
   which would otherwise be entered into the shell interactively.
-- ``cuos.import(library)`` loads a module from the directory ``/lib``.
+- ``cuos.import(library, [force])`` loads a module from the directory ``/lib``.
   This is basically like ``os.loadAPI``, but it fixes issus when files ending
-  in ``.lua`` are imported.
+  in ``.lua`` are imported. Also, it does import caching unless you tell it not
+  to by setting the *force* argument to ``true``.
 - ``cuos.deport(library)`` is the inverse of ``cuos.import``.
 - ``cuos.dev(filename)`` opens up the given execfile, and returns its
   contents (or ``nil`` if the file doesn't exist).
@@ -201,7 +202,9 @@ up whenever a modem is connected.
 
 - ``naming:start()`` is not intended to be used by users, and exists only to
   be run by the early stages of the operating system.
-- ``naming:resolve(host)`` resolves a hostname. If the host is numeric, then
+- ``naming.resolve(host)`` resolves a hostname. If the host is numeric, then
   the numeric form is returned (since it is assumed to be a computer ID). If
   the hostname is registered, then the ID for the registered host is returned;
   if none is registered, then ``nil`` is returned.
+- ``naming.get_hostname()`` returns the current hostname, or ``nil`` if none
+  is set.
