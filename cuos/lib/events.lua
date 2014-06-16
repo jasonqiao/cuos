@@ -7,20 +7,20 @@ function EventLoop()
         event_handlers = {},
         is_terminated = false,
         register = function(this, event_type, func)
-            this.event_handlers[event_type] = nil
+            this.event_handlers[event_type] = func
         end,
         next = function(this)
             local event_info = {os.pullEvent()}
             local event_type = event_info[1]
 
-            local callback = event_handlers[event_type]
+            local callback = this.event_handlers[event_type]
             if callback ~= nil then
                 callback(unpack(event_info))
             end
         end,
         run = function(this)
             while not this.is_terminated do
-                this.next()
+                this:next()
             end
         end,
         terminate = function(this)
