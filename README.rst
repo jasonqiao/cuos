@@ -166,10 +166,15 @@ connectionless datagram sockets.
 
 The ``Datagram`` object has the following API:
 
-- ``Datagram:bind(port)`` binds the socket to the given port, and becomes ready
-  to receive messages on that port.
+- ``Datagram:bind(port)`` readies the socket to receive messages on the given
+  port. Note that multiple ports can be bound, if you want to listen for
+  messages from multiple sources.
 - ``Datagram:sendto(host, port, message)`` sends the given datagram to the
-  given host and port.
-- ``Datagram:recvfrom()`` waits for a message, returning ``host, port, message``.
-- ``Datagram:close()`` causes the socket to stop receiving messages, if was
-  already bound.
+  given host and port. Note that, in the case of a broadcast message, the
+  host should be given as ``nil`` - otherwise, it should be the ID of the
+  intended receiver.
+- ``Datagram:recvfrom()`` waits for a message, returning ``host, port,   
+  message``. ``Datagram:recvfrom(host)`` waits for a message from a given host
+  (but on any port) and ``Datagram:recvfrom(host, port)`` waits for a message
+  from the given host on the given port.
+- ``Datagram:close()`` unbinds *all* ports bound by this socket.
