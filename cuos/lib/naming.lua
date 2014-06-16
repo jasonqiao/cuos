@@ -2,7 +2,7 @@
 A distributed, peer-to-peer service for naming hosts.
 --]]
 
-cuos.import('func') -- TODO: DELETE ME!
+cuos.import('func')
 cuos.import('events')
 cuos.import('socket')
 
@@ -58,8 +58,7 @@ function service()
             if timer_id == timer then
                 -- Refresh our hostname on the network
                 if datagram ~= nil then
-                    
-                datagram:sendto(nil, naming_port,
+                    datagram:sendto(nil, naming_port,
                         {event = announce_event, name = hostname})
                 end
 
@@ -67,12 +66,19 @@ function service()
                 -- recently
                 local now = os.clock()
                 local host, age
-                for name, last_update in pairs(binding_age) do
-                    if now - last_update > drop_interval then
-                        binding_age[name] = nil
-                        bindings[name] = nil
-                    end
-                end
+
+                -- Filter out any bindings which are too old
+                binding_age = func.filter(
+                    function(name, age)
+                        return now - age < drop_interval
+                    end,
+                    binding_age)
+
+                bindings = func.filter(
+                    function(name, id)
+                        return binding_age[name] ~= nil
+                    end,
+                    bindings)
 
                 timer = os.startTimer(announce_interval)
             end
@@ -80,12 +86,18 @@ function service()
 
     handler:register('datagram_recv',
         function(event, token)
-            local datagram
+            local _datagram
             local host
             local port
             local message
 
-            datagram, host, port, message = socket.get_last_message(token)
+            _datagram, host, port, message = socket.get_last_message(token)
+            if datagram ~= _datagram then
+                -- If the socket that sent this event was not _our_ socket,
+                -- then ignore the message.
+                return
+            end
+
             local peer_name = message.name
             if message.event == announce_event then
                 -- Make sure there are no naming clashes - if there are, then
@@ -98,9 +110,9 @@ function service()
                     datagram:sendto(host, port, {event = conflit_event})
                 end
             elseif message.event == conflict_event then
-                print("Hostname conflict - name service cannot continue!")
                 datagram:close()
                 handler:terminate()
+                error('Name service encountered hostname conflict')
             end
         end)
 
