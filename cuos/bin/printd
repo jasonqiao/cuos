@@ -51,6 +51,7 @@ function do_print(device, text)
         --print('>>>', line)
 
         if lineno > page_height then
+            printer.endPage()
             if not printer.newPage() then
                 error("Cannot start new page!")
             end
@@ -66,6 +67,8 @@ function do_print(device, text)
         lineno = lineno + 1
         printer.setCursorPos(1, lineno)
     end
+
+    printer.endPage()
 end
 
 function main()
