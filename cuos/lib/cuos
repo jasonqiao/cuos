@@ -2,26 +2,25 @@
 Core operating system utilities.
 --]]
 function import(lib)
-    local filename = "/lib/" .. lib .. ".lua"
-    local _loader = loadfile(filename)
-    if _loader == nil then
-        return nil
-    else
-        -- A safe way to recreate setfenv by loading the function bytecode
-        -- inside a new environment. This is necessary in case Computercraft
-        -- decides to switch to Lua 2.5, which lacks setfenv
-        local bytecode = string.dump(_loader)
-        local module = {}
-        local loader = load(bytecode, nil, nil, module)
-        loader()
-        return module
-    end
+    local filename = lib .. ".lua"
+    os.loadAPI("/lib/" .. filename)
+
+    -- os.loadAPI butchers the name, so we have to fix it
+    local module = _G[filename]
+    _G[filename] = nil
+    _G[lib] = module
 end
 
-processes = {}
+function deport(lib)
+    os.unloadAPI(lib)
+end
+
+-- Used by the scheduler, and the execution functions defined below
+local processes = {}
+
 function execute(func, ...)
     local wrapper_args = {...}
-    function wrapper()
+    local function wrapper()
         return func(unpack(wrapper_args))
     end
 
@@ -31,9 +30,9 @@ function execute(func, ...)
     -- Since the scheduler only reschedules a process when an event fires, we
     -- need to signal that it needs to run this new process for the first
     -- time. This notifies the scheduler without really doing anything.
-    time.sleep(0)
+    sleep(1)
 
-    while coro.status() ~= "dead" do
+    while coroutine.status(coro) ~= "dead" do
         -- This is a synthetic event, which is produced by the scheduler to
         -- notify the death of a process. Although it returns the process,
         -- the loop already tests to see if our process is dead, so
@@ -44,16 +43,19 @@ end
 
 function daemon(func, ...)
     local wrapper_args = {...}
-    function wrapper()
-        return func(unpack(wrapper_args))
+    local function wrapper()
+        func(unpack(wrapper_args))
     end
 
-    process[coroutine.create(wrapper)] = true
+    local coro = coroutine.create(wrapper)
+    processes[coro] = true
 
     -- Since the scheduler only reschedules a process when an event fires, we
     -- need to signal that it needs to run this new process for the first
     -- time. This notifies the scheduler without really doing anything.
-    time.sleep(0)
+    sleep(0)
+
+    return coro
 end
 
 function run_script(filename)
