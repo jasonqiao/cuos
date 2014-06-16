@@ -1,0 +1,18 @@
+cuos.import('naming')
+
+local args = {...}
+function main()
+    if #args ~= 1 then
+        error("resolve HOSTNAME")
+    end
+
+    local name = args[1]
+    local host = naming.resolve(name)
+    if host ~= nil then
+        print(name .. " resolves to #" .. host)
+    else
+        print(name .. " does not resolve")
+    end
+end
+
+cuos.execute(main)

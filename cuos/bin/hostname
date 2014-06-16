@@ -1,0 +1,12 @@
+cuos.import('naming')
+
+function main()
+    local hostname = naming.get_hostname()
+    if hostname == nil then
+        print('You have no hostname')
+    else
+        print('Your hostname is ' .. hostname)
+    end
+end
+
+cuos.execute(main)
