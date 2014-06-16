@@ -94,6 +94,9 @@ The ``cuos`` module has the following API:
 - ``cuos.deport(library)`` is the inverse of ``cuos.import``.
 - ``cuos.dev(filename)`` opens up the given execfile, and returns its
   contents (or ``nil`` if the file doesn't exist).
+- ``cuos.get_peripheral(type)`` gets the path to the execfile for a given 
+  peripheral type, or returns ``nil`` - for example, 
+  ``cuos.get_periphal('modem')`` could return ``/dev/modemT``.
 - ``cuos.run_shell()`` executes a shell which is similar to the CraftOS shell.
 - ``cuos.scheduler()`` is intended only for use by the operating system - it
   dispatches events to processes.

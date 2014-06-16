@@ -77,6 +77,15 @@ function dev(filename)
     end
 end
 
+function get_peripheral(type)
+    for _, filename in pairs(fs.list('/dev')) do
+        if string.match(filename, type .. '[LRTUFB]') then
+            return '/dev/' .. filename
+        end
+    end
+    return nil
+end
+
 function scheduler()
     -- The most recent event
     local event_data = nil
