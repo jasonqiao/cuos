@@ -21,6 +21,7 @@ term.setTextColor(colors.white)
 os.loadAPI("/lib/cuos")
 cuos.import('func')
 cuos.import('hotplug')
+cuos.import('naming')
 
 -- The shell API doesn't, by default, exist inside of APIs which are loaded,
 -- so we need to account for that and smuggle the shell environment inside
@@ -34,6 +35,10 @@ func.foreach(
 print(">>> Loading devices")
 hotplug.load_devices()
 hotplug.start()
+
+-- Start the naming service
+print(">>> Launching naming service")
+naming.start()
 
 -- Loads the init script - note that this has to be a stub, since the
 -- scheduler is not active yet

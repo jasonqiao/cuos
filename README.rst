@@ -191,3 +191,17 @@ The ``Datagram`` object has the following API:
   ``socket.get_last_message(token)`` which will return ``host, port, data`` of 
   the most recent message.
 - ``Datagram:close()`` unbinds *all* ports bound by this socket.
+
+The naming Module
+~~~~~~~~~~~~~~~~~
+
+The ``naming`` module provides a peer-to-peer host naming service.
+It is intended to be resistant to network outages, by automatically starting
+up whenever a modem is connected.
+
+- ``naming:start()`` is not intended to be used by users, and exists only to
+  be run by the early stages of the operating system.
+- ``naming:resolve(host)`` resolves a hostname. If the host is numeric, then
+  the numeric form is returned (since it is assumed to be a computer ID). If
+  the hostname is registered, then the ID for the registered host is returned;
+  if none is registered, then ``nil`` is returned.
