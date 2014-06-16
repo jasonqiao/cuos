@@ -1,0 +1,39 @@
+--[[
+Sends a document to a network printer.
+--]]
+
+cuos.import('naming')
+cuos.import('socket')
+
+local print_port = 1002
+
+local args = {...}
+function main()
+    if #args ~= 2 then
+        error("print HOST FILE")
+    end
+
+    local host = args[1]
+    local peer = naming.resolve(host)
+    if peer == nil then
+        error("Host " .. host .. " does not exist")
+    end
+
+    local file = args[2]
+    local handle = fs.open(file, 'r')
+    if handle == nil then
+        error("Cannot open file " .. file)
+    end
+
+    local modem = cuos.get_peripheral('modem')
+    if modem == nil then
+        error("Cannot connect to the network")
+    end
+    print("Printing via " .. modem)
+
+    local sock = socket.Datagram(modem)
+    sock:sendto(peer, print_port, handle.readAll())
+    handle.close()
+end
+
+cuos.execute(main)

@@ -1,0 +1,98 @@
+--[[
+Printing daemon - accepts printing jobs over the network.
+--]]
+
+cuos.import('socket')
+
+local print_port = 1002
+
+function length_split(text, cols)
+    local line_iter = string.gmatch(text, "[^\r\n]+")
+    local line_buffer = nil
+    return function()
+        local line
+        if line_buffer ~= nil then
+            line = line_buffer
+        else
+            line = line_iter()
+        end
+
+        if line == nil then
+            return nil
+        elseif string.len(line) >= cols then
+            -- Split the line into the part within the limit, and the part
+            -- which extends beyond the limit
+            local line_chunk = string.sub(line, 0, cols)
+            line_buffer = string.sub(line, cols)
+            return line_chunk
+        else
+            -- If everything fits inside the line, then we might be and the end
+            -- of a buffered line, and we need to clear it
+            line_buffer = nil
+            return line
+        end
+    end
+end
+
+function do_print(device, text)
+    local printer = device.methods
+    local page = 1
+
+    if not printer.newPage() then
+        error("Cannot create initial page")
+    end
+
+    printer.setPageTitle('Page ' .. tostring(page))
+    local page_width, page_height = printer.getPageSize()
+
+    local lineno = 1
+
+    for line in length_split(text, page_width) do
+        --print('>>>', line)
+
+        if lineno > page_height then
+            if not printer.newPage() then
+                error("Cannot start new page!")
+            end
+
+            lineno = 1
+            page = page + 1
+
+            printer.setPageTitle('Page ' .. tostring(page))
+            printer.setCursorPos(1, lineno)
+        end
+
+        printer.write(line)
+        lineno = lineno + 1
+        printer.setCursorPos(1, lineno)
+    end
+end
+
+function main()
+    print(">>> Starting printer daemon")
+    
+    local printer = cuos.get_peripheral('printer')
+    if printer == nil then
+        error('No printer attached!')
+        return
+    end
+    printer = cuos.dev(printer)
+
+    local modem = cuos.get_peripheral('modem')
+    if modem == nil then
+        error('No modem attached!')
+    end
+
+    local server = socket.Datagram(modem)
+    server:bind(print_port)
+    while true do
+        local job
+        host, _, job = server:recvfrom(nil, print_port)
+        print("Starting job from " .. host)
+        do_print(printer, job)
+        print("Done with job from " .. host)
+    end
+    server:close()
+end
+
+cuos.daemon(main)
