@@ -130,7 +130,11 @@ function scheduler()
                 end
 
                 if not is_okay then
-                    error(param)
+                    event_filters[routine] = nil
+
+                    term.setTextColor(colors.red)
+                    print(param)
+                    term.setTextColor(colors.white)
                 else
                     event_filters[routine] = param
                 end
@@ -183,7 +187,7 @@ function run_shell()
         if first_word == "exit" then
             done = true
         else
-            shell.run(command)
+            pcall(shell.run(command))
         end
     end
 end
