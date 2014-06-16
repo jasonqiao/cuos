@@ -15,7 +15,7 @@ CUOS has the following important design goals:
   represented as files on the file-system which contain executable Lua code.
 - *Scriptable Shell*. CUOS implements shell scripts, to make running simple
   commands easier.
-
+  
 Design
 ------
 
@@ -69,7 +69,7 @@ is a side: L (left), R (right), T (top), U (under, or *bottom*), F (front), B (b
 - ``/dev/peripherals`` can contain the files *left*, *right*, 
     *front*, *back*, *top* and *bottom* describing the hardware devices
     connected to the machine. These are equivalent to the devices under 
-    ``/dev`` - for example, if a modem is on the left, then 
+   ``/dev`` - for example, if a modem is on the left, then 
     ``/dev/peripherals/left`` is equivalent to ``/dev/modemL``.
 
 The cuos Module
@@ -77,22 +77,42 @@ The cuos Module
 
 The ``cuos`` module has the following API:
 
-- ``cuos.execute(func, ...)`` schedules a particular function to be run.
-  This is meant to allow the operating system to run its own processes, such
-  as responding to ping requests and other things. This waits on the given
-  function, returning when the function which was added to the queue stops
-  running. This is intended for user programs.
+- ``cuos.execute(func, ...)`` schedules a particular function to be run as a
+  process. This is essentially how CUOS multitakss - you should have one of
+  these in every program that you write, so that CUOS can run other programs
+  while you're program waits for events. This is inteded for user programs,
+  because it waits until the given function has stopped executing.
 - ``cuos.daemon(func, ...)`` schedules a particular function to be run.
-  This is the same as ``cuos.execute``, but it runs asynchronously, allowing
-  for the creation of background services.
+  This is the same as ``cuos.execute``, but it returns the coroutine used to
+  run the given function, instead of waiting for it to exit. This is meant to
+  be used for background services.
 - ``cuos.run_script(filename)`` runs a shell script, a sequence of commands
   which would otherwise be entered into the shell interactively.
-- ``cuos.import(library)`` loads a module from the directory `/lib`.
-  Note that, unlike os.loadAPI, this imports the library and returns it as a
-  value, so it isn't available everywhere.
+- ``cuos.import(library)`` loads a module from the directory ``/lib``.
+  This is basically like ``os.loadAPI``, but it fixes issus when files ending
+  in ``.lua`` are imported.
+- ``cuos.deport(library)`` is the inverse of ``cuos.import``.
 - ``cuos.dev(filename)`` opens up the given execfile, and returns its
   contents (or ``nil`` if the file doesn't exist).
-- ``cuos.shell()`` executes a shell which is similar to the CraftOS shell.
+- ``cuos.run_shell()`` executes a shell which is similar to the CraftOS shell.
+- ``cuos.scheduler()`` is intended only for use by the operating system - it
+  dispatches events to processes.
+
+In addition, the ``cuos`` module has the attribute ``cuos.shell``, which is
+what programs should use instead of accessing the ``shell`` module directly.
+
+(This is because they aren't "controlling" the terminal").
+
+The hotplug Module
+~~~~~~~~~~~~~~~~~~
+
+The ``hotplug`` module manages the ``/dev`` hierarchy. It is not inteded for
+use by user programs - it is documented here for completeness.
+
+- ``hotplug.load_devices`` does a sweep of all the peripherals, and constructs
+  the ``/dev`` hierarchy.
+- ``hotplug.start`` loads the hotplugging daemon, which runs all the time and
+  updates the ``/dev`` hierarchy whenever the peripherals change.
 
 The func Module
 ~~~~~~~~~~~~~~~
@@ -130,22 +150,6 @@ a given event loop.
 - ``EventLoop:next()`` waits for the next event.
 - ``EventLoop:run()`` runs the event loop until terminated.
 - ``EventLoop:terminate()`` terminates the event loop.
-
-The queue Module
-~~~~~~~~~~~~~~~~
-
-The ``queue`` module is an implementation of a Lua queue, using the
-two-indicies method.
-
-- ``queue.Queue()`` returns a ``Queue`` object.
-
-The ``Queue`` object has the following API:
-
-- ``Queue:is_empty()``
-- ``Queue:push_left(value)``
-- ``Queue:push_right(value)``
-- ``Queue:pop_left()``
-- ``Queue:pop_right()``
 
 The socket Module
 ~~~~~~~~~~~~~~~~~
