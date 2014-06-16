@@ -24,7 +24,7 @@ function EventLoop()
             end
         end,
         terminate = function(this)
-            this.terminated = true
+            this.is_terminated = true
         end,
     }
 end
