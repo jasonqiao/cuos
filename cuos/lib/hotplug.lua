@@ -8,7 +8,7 @@ local sides = {
     front="F", back="B"
 }
 
-local events = cuos.import('events')
+cuos.import('events')
 
 function load_devices()
     -- Clean out /dev before recreating it
@@ -28,7 +28,7 @@ return {
     side = "%s",
     type = "%s",
     methods = peripheral.wrap("%s")
-]==], side, peripheral_type, side)
+}]==], side, peripheral_type, side)
 
             -- Load the named version of the peripheral, as well
             local named_peripheral = fs.open('/dev/' .. peripheral_type
@@ -44,8 +44,8 @@ end
 
 function start()
     local handler = events.EventLoop()
-    handler.register('peripheral', load_devices)
-    handler.register('peripheral_detach', load_devices)
+    handler:register('peripheral', load_devices)
+    handler:register('peripheral_detach', load_devices)
 
     cuos.daemon(handler.run, handler)
 end
