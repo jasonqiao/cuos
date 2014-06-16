@@ -2,6 +2,7 @@
 A small networking library intended to mimick the Berkeley sockets API.
 --]]
 
+cuos.import('func')
 cuos.import('events')
 
 function datagram_packet(host, port, data)
@@ -18,17 +19,16 @@ end
 -- we can't send more than one argument via os.queueEvent, so we
 -- have to save the most recent message here so that way an
 -- event handler can phone home and get it.
-local min_datagram_token = -100000
-local max_datagram_token = 100000
-function generate_id()
-    return math.random(min_datagram_token, max_datagram_token)
-end
-
 local saved_messages = {}
 function get_last_message(token)
     local data = saved_messages[token]
+
     saved_messages[token] = nil
-    return data.socket, data.host, data.port, data.data
+    if data ~= nil then
+        return data.socket, data.host, data.port, data.data
+    else
+        return nil
+    end
 end
 
 function Datagram(device)
@@ -57,7 +57,7 @@ function Datagram(device)
                 handler:register('modem_message',
                     function(event, side, send_chan, reply_chan, packet, dist)
                         local is_our_modem = (
-                            side == modem.side
+                            side == this.modem.side
                         )
 
                         -- Since we receive all packets with wireless modems,
@@ -80,7 +80,8 @@ function Datagram(device)
                                 host_matches and 
                                 port_matches) then
 
-                            local message_token = generate_id()
+                            local message_token = tostring(packet.source) 
+                                .. ':' .. tostring(packet.port)
                             saved_messages[message_token] = {
                                 socket = this,
                                 host = packet.source, 
