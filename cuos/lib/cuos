@@ -131,6 +131,7 @@ function scheduler()
 
                 if not is_okay then
                     event_filters[routine] = nil
+                    processes[routine] = nil
 
                     term.setTextColor(colors.red)
                     print(param)
