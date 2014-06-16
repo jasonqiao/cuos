@@ -44,6 +44,7 @@ naming.start()
 -- scheduler is not active yet
 local function init_stub()
     print(">>> Loading init")
+    shell.setPath(shell.path() .. ":/bin")
     shell.run('/init')
 end
 
