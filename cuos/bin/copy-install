@@ -1,0 +1,43 @@
+--[[
+Copies an already exisexisting version of CUOS to another medium.
+--]]
+
+copy_list = {'/bin', '/init', '/startup', '/lib', '/etc'}
+delete_list = {'/etc/hostname'}
+
+local args = {...}
+function main()
+    if #args ~= 2 then
+        error('copy-install SOURCE DEST')
+    end
+
+    local source = args[1]
+    local dest = args[2]
+
+    if not fs.exists(source) or not fs.exists(dest) then
+        error('Source or destination does not exist')
+    end
+
+    for _, entry in pairs(copy_list) do
+        local source_filename = source .. entry
+
+        if fs.exists(source_filename) then
+            print('Copying ' .. entry)
+            fs.copy(source_filename, dest .. entry)
+        else
+            print('Cannot copy ' .. entry)
+        end
+    end
+
+    for _, entry in pairs(delete_list) do
+        local dest_filename = dest .. entry
+        if fs.exists(dest_filename) then
+            print('Removing ' .. entry)
+            fs.delete(dest_filename)
+        else
+            print('Cannot remove ' .. entry)
+        end
+    end
+end
+
+cuos.execute(main)
