@@ -210,3 +210,25 @@ up whenever a modem is connected.
   is set.
 - ``naming.get_bindings()`` returns an ``host, id`` iterator for all registered
   hosts.
+
+The deque Module
+~~~~~~~~~~~~~~~~
+
+The ``deque`` module provides an implementation of double-ended queues.
+
+- ``deque:Deque`` returns a new ``Deque`` object.
+
+A ``Deque`` object has the following API:
+
+- ``Deque:tolist()`` converts the items in the deque, from left to right, into
+  a list indexed at 1.
+- ``Deque:len()`` returns the length of the deque.
+- ``Deque:iterleft()`` and ``Deque:iterright()`` return iterators for all the
+  elements in the deque - ``iterleft()`` starts from the left and goes right,
+  while ``iterright()`` starts at the right and goes left.
+- ``Deque:empty()`` returns ``Deque:len() == 0``.
+- ``Deque:pushleft(x)`` and ``Deque:pushright(x)`` add elements to the deque,
+  where the side to which the item is added should be obvious.
+- ``Deque:popleft()`` and ``Deque:popright()`` remove and return the last
+  element of the queue on the given side, or raise an error if the queue is
+  empty.
