@@ -233,3 +233,14 @@ A ``Deque`` object has the following API:
 - ``Deque:popleft()`` and ``Deque:popright()`` remove and return the last
   element of the queue on the given side, or raise an error if the queue is
   empty.
+
+The readline Module
+~~~~~~~~~~~~~~~~~~~
+
+The ``readline`` module provides a simple interface for line editing, which
+provides basic movement and insertion features as well as history.
+
+- ``readline.readline(prompt, [history])`` reads a line of text, using 
+  ``prompt`` to delimit each screen line. If ``history`` is given, it must
+  be a ``deque.Deque``, and this function will use it to provide history
+  navigation. This returns the line of text read from the user.

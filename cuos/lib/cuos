@@ -182,6 +182,10 @@ end
 shell = {}
 
 function run_shell()
+    import('deque')
+    import('readline')
+
+    local history = deque.Deque()
     local command = ""
     local done = false
 
@@ -189,15 +193,14 @@ function run_shell()
     print("CUOS Shell")
 
     while not done do
+        term.setTextColor(colors.orange)
         local prompt = string.format("<</%s @ %d>>",
                 shell.dir(), 
                 os.getComputerID())
-
-        term.setTextColor(colors.orange)
         print(prompt)
-        term.write("> ")
         term.setTextColor(colors.white)
-        command = read()
+
+        command = readline.readline('> ', history)
 
         first_word = string.gsub(command, "%s*(%S+)%s?.*", "%1")
         if first_word == "exit" then
