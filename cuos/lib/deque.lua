@@ -2,6 +2,14 @@
 A double-ended queue implementation.
 --]]
 
+function fromiter(iter)
+    local d = Deque()
+    for item in iter do
+        d:pushright(item)
+    end
+    return d
+end
+
 function Deque()
     return {
         data = {},

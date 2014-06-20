@@ -217,6 +217,7 @@ The deque Module
 The ``deque`` module provides an implementation of double-ended queues.
 
 - ``deque:Deque`` returns a new ``Deque`` object.
+- ``deque:fromiter(iter)`` returns a new ``Deque`` populated by the iterator.
 
 A ``Deque`` object has the following API:
 
