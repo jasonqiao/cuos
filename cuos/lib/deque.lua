@@ -26,7 +26,7 @@ function Deque()
                 if index == this.right then
                     return nil
                 else
-                    index = index - 1
+                    index = index + 1
                     return this.data[index]
                 end
             end
@@ -60,7 +60,7 @@ function Deque()
             this.data[this.right] = value
         end,
         popleft = function(this, value)
-            if this:is_empty() then
+            if this:empty() then
                 error('Empty deque')
             end
 
@@ -70,7 +70,7 @@ function Deque()
             return value
         end,
         popright = function(this, value)
-            if this:is_empty() then
+            if this:empty() then
                 error('Empty deque')
             end
 
