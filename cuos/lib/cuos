@@ -149,6 +149,8 @@ function scheduler()
                     term.setTextColor(colors.red)
                     print(param)
                     term.setTextColor(colors.white)
+
+                    os.queueEvent("process_died", routine)
                 else
                     event_filters[routine] = param
                 end
